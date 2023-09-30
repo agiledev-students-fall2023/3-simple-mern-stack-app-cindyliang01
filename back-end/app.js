@@ -13,15 +13,15 @@ app.use(express.json()) // decode JSON-formatted incoming POST data
 app.use(express.urlencoded({ extended: true })) // decode url-encoded incoming POST data
 
 // connect to database
-mongoose
-  .connect(`${process.env.DB_CONNECTION_STRING}`)
-  .then(data => console.log(`Connected to MongoDB`))
-  .catch(err => console.error(`Failed to connect to MongoDB: ${err}`))
+// mongoose
+//   .connect(${process.env.DB_CONNECTION_STRING})
+//   .then(data => console.log(Connected to MongoDB))
+//   .catch(err => console.error(Failed to connect to MongoDB: ${err}))
 
 // load the dataabase models we want to deal with
 const { Message } = require('./models/Message')
 const { User } = require('./models/User')
-
+// const AboutMe = require('./models/aboutMeModel')
 // a route to handle fetching all messages
 app.get('/messages', async (req, res) => {
   // load all messages from database
@@ -78,5 +78,21 @@ app.post('/messages/save', async (req, res) => {
   }
 })
 
-// export the express app we created to make it available to other modules
+const transformGoogleDriveLink = link => {
+  const fileId = link.split('/file/d/')[1].split('/view')[0]
+  return `https://drive.google.com/uc?export=view&id=${fileId}`
+}
+
+const data = {
+  image: transformGoogleDriveLink(
+    'https://drive.google.com/file/d/1WKYz6vIGF851ESw0HOX9Nu-Bt4MX9GL2/view?usp=sharing'
+  ),
+  content:
+    'Hello, nice to meet you! My name is Cindy Liang and I was born and raised in Brooklyn. Some of my hobbies include dancing, playing badminton, and taking walks around my neighborhood. I do not game but I am very good at Tetris and I am always looking for challengers. I have always wanted to visit an aquarium, but for some reason, I have never gone. My favorite anime is One Piece. I love vanilla ice cream and egg tarts. I also love anything pink. :)',
+}
+
+app.get('/about-us', (req, res) => {
+  res.json(data)
+})
+
 module.exports = app // CommonJS export style!
